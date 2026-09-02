@@ -1,0 +1,15 @@
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.csproj.AssemblyReference.cache
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.GeneratedMSBuildEditorConfig.editorconfig
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.AssemblyInfoInputs.cache
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.AssemblyInfo.cs
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.csproj.CoreCompileInputs.cache
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.sourcelink.json
+C:\workplace\diario.data\bin\Debug\net9.0\diario.data.deps.json
+C:\workplace\diario.data\bin\Debug\net9.0\diario.data.runtimeconfig.json
+C:\workplace\diario.data\bin\Debug\net9.0\diario.data.dll
+C:\workplace\diario.data\bin\Debug\net9.0\diario.data.pdb
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.dll
+C:\workplace\diario.data\obj\Debug\net9.0\refint\diario.data.dll
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.pdb
+C:\workplace\diario.data\obj\Debug\net9.0\diario.data.genruntimeconfig.cache
+C:\workplace\diario.data\obj\Debug\net9.0\ref\diario.data.dll
