@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
     "net9.0": {
       "Humanizer.Core/2.14.1": {
@@ -910,6 +910,16 @@
         },
         "build": {
           "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "diario.model/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/diario.model.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/diario.model.dll": {}
         }
       }
     }
@@ -2785,28 +2795,34 @@
         "system.threading.channels.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "diario.model/1.0.0": {
+      "type": "project",
+      "path": "../diario.model/diario.model.csproj",
+      "msbuildProject": "../diario.model/diario.model.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
       "Microsoft.EntityFrameworkCore.Design >= 9.0.19",
-      "Pomelo.EntityFrameworkCore.MySql >= 9.0.0"
+      "Pomelo.EntityFrameworkCore.MySql >= 9.0.0",
+      "diario.model >= 1.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Suporte\\.nuget\\packages\\": {}
+    "C:\\Users\\ferna\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\workplace\\diario.data\\diario.data.csproj",
+      "projectUniqueName": "C:\\workstation\\SENACprojects\\MeuDiarioSenac\\diario.data\\diario.data.csproj",
       "projectName": "diario.data",
-      "projectPath": "C:\\workplace\\diario.data\\diario.data.csproj",
-      "packagesPath": "C:\\Users\\Suporte\\.nuget\\packages\\",
-      "outputPath": "C:\\workplace\\diario.data\\obj\\",
+      "projectPath": "C:\\workstation\\SENACprojects\\MeuDiarioSenac\\diario.data\\diario.data.csproj",
+      "packagesPath": "C:\\Users\\ferna\\.nuget\\packages\\",
+      "outputPath": "C:\\workstation\\SENACprojects\\MeuDiarioSenac\\diario.data\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Suporte\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ferna\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -2816,9 +2832,12 @@
       },
       "frameworks": {
         "net9.0": {
-          "framework": "net9.0",
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\workstation\\SENACprojects\\MeuDiarioSenac\\diario.model\\diario.model.csproj": {
+              "projectPath": "C:\\workstation\\SENACprojects\\MeuDiarioSenac\\diario.model\\diario.model.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -2831,11 +2850,10 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.300"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
-        "framework": "net9.0",
         "targetAlias": "net9.0",
         "dependencies": {
           "Microsoft.EntityFrameworkCore.Design": {
@@ -2860,26 +2878,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[9.0.18, 9.0.18]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[9.0.18, 9.0.18]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[9.0.18, 9.0.18]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.311/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

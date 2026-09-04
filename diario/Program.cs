@@ -1,15 +1,35 @@
 ﻿var diario = new RegistroDAO();
 
+RegistroBusiness registroBusiness = new RegistroBusiness();
+
 void CriarRegistro(RegistroDAO diario)
 {
     Console.WriteLine("Titulo: ");
     string titulo = Console.ReadLine();
+
+    try
+        {
+        registroBusiness.TituloInformado(titulo);
+        registroBusiness.TituloMax(titulo);
+        Console.WriteLine("Título cadastrado com sucesso!");
+        }
+    catch (ArgumentException ex)
+        {
+        Console.WriteLine($"Erro capturado: {ex.Message}");
+        return;
+        }
 
     DateTime data;
     try
     {
         Console.WriteLine("Data (yyyy-MM-dd): ");
         data = DateTime.Parse(Console.ReadLine());
+        registroBusiness.DataAtual(data);
+    }
+    catch (ArgumentException ex)
+    {
+        Console.WriteLine($"Erro capturado: {ex.Message}");
+        return;
     }
     catch (FormatException)
     {
