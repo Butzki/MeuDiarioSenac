@@ -1,8 +1,8 @@
-﻿var diario = new RegistroDAO();
+﻿var diario = new RegistroService();
 
 RegistroBusiness registroBusiness = new RegistroBusiness();
 
-void CriarRegistro(RegistroDAO diario)
+void CriarRegistro(RegistroService diario)
 {
     Console.WriteLine("Titulo: ");
     string titulo = Console.ReadLine();
@@ -40,7 +40,7 @@ void CriarRegistro(RegistroDAO diario)
     Console.WriteLine("Conteudo: ");
     string conteudo = Console.ReadLine();
 
-    diario.Inserir(new Registro
+    diario.AdicionarRegistro(new Registro
     {
         Titulo = titulo,
         Data = data,
@@ -49,9 +49,9 @@ void CriarRegistro(RegistroDAO diario)
     Console.WriteLine("\nRegistro inserido com sucesso!\n");
 }
 
-void ListarRegistros(RegistroDAO diario)
+void ListarRegistros(RegistroService diario)
 {
-    var registros = diario.ListarTodos();
+    var registros = diario.ListarRegistros();
 
     if (registros.Count == 0)
     {
@@ -65,7 +65,7 @@ void ListarRegistros(RegistroDAO diario)
     }
 }
 
-void BuscarRegistro(RegistroDAO diario)
+void BuscarRegistro(RegistroService diario)
 {
     Console.WriteLine("Digite o ID do registro que deseja encontrar: ");
     int id = int.Parse(Console.ReadLine());
@@ -86,7 +86,7 @@ void BuscarRegistro(RegistroDAO diario)
         }
 }
 
-void DeletarRegistro(RegistroDAO diario)
+void DeletarRegistro(RegistroService diario)
 {
     Console.WriteLine("Digite o ID do registro que deseja remover: ");
     int id = int.Parse(Console.ReadLine());
@@ -98,7 +98,7 @@ void DeletarRegistro(RegistroDAO diario)
         }
         else if (r.Id == id)
         {
-            diario.Delete(r);
+            diario.RemoverRegistro(r);
             Console.WriteLine("\nRegistro removido com sucesso!\n");
             return;
         }
@@ -108,7 +108,7 @@ void DeletarRegistro(RegistroDAO diario)
         }
 }
 
-void AtualizarRegistro(RegistroDAO diario)
+void AtualizarRegistro(RegistroService diario)
 {
     Console.WriteLine("Digite o ID do registro que deseja atualizar: ");
     int id = int.Parse(Console.ReadLine());
@@ -142,7 +142,7 @@ void AtualizarRegistro(RegistroDAO diario)
                 r.Data = data;
                 r.Conteudo = conteudo;
                 
-                diario.Update(r);
+                diario.AtualizarRegistro(r);
 
                 Console.WriteLine("\nRegistro atualizado com sucesso!\n");
                 return;

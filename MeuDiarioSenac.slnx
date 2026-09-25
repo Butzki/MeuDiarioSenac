@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="diario.business/diario.business.csproj" />
+  <Project Path="diario.data/diario.data.csproj" />
+  <Project Path="diario.model/diario.model.csproj" />
+  <Project Path="diario.service/diario.service.csproj" />
+  <Project Path="diario.webapi/diario.webapi.csproj" />
+  <Project Path="diario/diario.csproj" />
+</Solution>

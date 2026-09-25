@@ -182,7 +182,6 @@ C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\System.Confi
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\System.Diagnostics.EventLog.dll
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\System.Security.Cryptography.ProtectedData.dll
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\System.Security.Permissions.dll
-C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\System.Text.Json.dll
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\System.Windows.Extensions.dll
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\ZstdSharp.dll
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\bin\Debug\net9.0\cs\Microsoft.CodeAnalysis.resources.dll
@@ -276,3 +275,5 @@ C:\workstation\SENACprojects\MeuDiarioSenac\diario\obj\Debug\net9.0\refint\diari
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\obj\Debug\net9.0\diario.pdb
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\obj\Debug\net9.0\diario.genruntimeconfig.cache
 C:\workstation\SENACprojects\MeuDiarioSenac\diario\obj\Debug\net9.0\ref\diario.dll
+C:\workstation\SENACProjects\MeuDiarioSenac\diario\bin\Debug\net9.0\diario.service.dll
+C:\workstation\SENACProjects\MeuDiarioSenac\diario\bin\Debug\net9.0\diario.service.pdb

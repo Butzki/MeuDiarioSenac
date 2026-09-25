@@ -1,9 +1,22 @@
 # MeuDiarioSenac
+
+Aplicação de console em C# para gerenciamento de um diário pessoal, com CRUD completo de registros, persistidos em banco de dados MySQL via Entity Framework Core.
+
 ## Funcionalidades
 
 - **CRUD completo** de registros (inserir, listar, buscar por ID, atualizar e remover)
+- **Validações de regra de negócio** (título obrigatório e limitado a 50 caracteres, conteúdo limitado a 3000 caracteres, data obrigatoriamente atual)
 - **Persistência de dados** em banco MySQL, usando Entity Framework Core como ORM
 - **Camada de acesso a dados (DAO)** separada da lógica de interface, isolando as operações de banco das interações com o usuário
+
+## Estrutura do projeto
+
+O projeto é dividido em múltiplos projetos .NET:
+
+- **`diario`** — projeto de console (executável), com o menu interativo (`Program.cs`)
+- **`diario.data`** — camada de acesso a dados: `RegistroDAO` e o contexto do Entity Framework (`banco.cs`)
+- **`diario.business`** — regras de negócio e validações (`RegistroBusiness`)
+- **`diario.model`** — entidades do domínio (`Registro`, `Usuario`)
 
 ## Tecnologias
 
@@ -11,19 +24,21 @@
 - Entity Framework Core
 - MySQL
 
-## Antes de rodar: é necessário executar as Migrations
+## Antes de rodar: é necessário ter o MySQL Server e executar as Migrations
 
-O banco de dados **não está incluído neste repositório**. 
-Para que o projeto funcione, é obrigatório gerar e aplicar as migrations do Entity Framework Core antes de tentar rodar ou testar o CRUD. 
-Sem isso, o banco `MeuDiarioSenac` e suas tabelas não vão existir, e a aplicação vai falhar ao tentar se conectar.
+O banco de dados **não está incluído neste repositório** — apenas o código-fonte. Para que o projeto funcione, é obrigatório ter um servidor MySQL rodando localmente e gerar/aplicar as migrations do Entity Framework Core antes de tentar rodar ou testar o CRUD. Sem isso, o banco `MeuDiarioSenac` e suas tabelas não vão existir, e a aplicação vai falhar ao tentar se conectar.
 
 ### Pré-requisitos
 
 - .NET SDK instalado
-- MySQL Server rodando localmente
+- **MySQL Server** instalado e rodando localmente (baixe em [dev.mysql.com/downloads/installer](https://dev.mysql.com/downloads/installer/) — não é necessário criar conta na Oracle, use a opção "No thanks, just start my download")
 - Ferramenta `dotnet-ef` instalada globalmente:
   ```bash
   dotnet tool install --global dotnet-ef
+  ```
+- Pacote `Microsoft.EntityFrameworkCore.Design` instalado no projeto `diario` (necessário para o comando `dotnet ef` funcionar em uma estrutura multi-projeto). Use a mesma versão principal do EF Core já usada no `diario.data`:
+  ```bash
+  dotnet add diario package Microsoft.EntityFrameworkCore.Design --version <versão do EF Core do projeto>
   ```
 
 ### Passo a passo
@@ -45,14 +60,14 @@ Sem isso, o banco `MeuDiarioSenac` e suas tabelas não vão existir, e a aplica�
    dotnet restore
    ```
 
-4. **Gere as migrations** (cria os arquivos que descrevem a estrutura do banco a partir do modelo)
+4. **Gere as migrations** (cria os arquivos que descrevem a estrutura do banco a partir do modelo). Como o `DbContext` fica em `diario.data` e o executável é `diario`, é necessário indicar os dois projetos:
    ```bash
-   dotnet ef migrations add InitialCreate
+   dotnet ef migrations add InitialCreate --project diario.data --startup-project diario
    ```
 
-5. **Aplique as migrations no banco de dados** (cria o banco `MeuDiarioSenac` e as tabelas `Usuarios` e `Registros`)
+5. **Aplique as migrations no banco de dados** (cria o banco `MeuDiarioSenac` e a tabela `Registros`)
    ```bash
-   dotnet ef database update
+   dotnet ef database update --project diario.data --startup-project diario
    ```
 
 6. **Rode a aplicação**
@@ -60,4 +75,17 @@ Sem isso, o banco `MeuDiarioSenac` e suas tabelas não vão existir, e a aplica�
    dotnet run --project diario
    ```
 
-Depois desses passos, o menu do CRUD (inserir, listar, buscar, atualizar e remover registros) deve funcionar normalmente.
+### Usando o menu
+
+Ao rodar a aplicação, o menu apresenta as seguintes opções:
+
+```
+1 - Inserir registro
+2 - Listar registros
+3 - Buscar registro por ID
+4 - Remover registro por ID
+5 - Atualizar registro por ID
+6 - Sair
+```
+
+> **Observação:** todo registro criado é associado a um `UsuarioId` fixo (`1`), já que ainda não há um cadastro de usuários implementado nesta versão do projeto.
