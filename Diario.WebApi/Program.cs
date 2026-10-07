@@ -10,6 +10,13 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
+app.MapPost("/login/auth", () =>
+{
+    TokenService authService = new TokenService(builder.Configuration);
+    return authService.GerarToken(null);
+
+});
+
 var registrosGroup = app.MapGroup("/registros");
 
 registrosGroup.MapGet("/", () =>
@@ -43,6 +50,20 @@ registrosGroup.MapDelete("/{id}", (int id) =>
 
     new RegistroService().RemoverRegistro(registro);
     return Results.Ok("Registro removido com sucesso!");
+});
+
+var usuariosGroup = app.MapGroup("/usuarios");
+
+usuariosGroup.MapPost("/registrar", ([FromBody] Usuario usuario) =>
+{
+    new UsuarioService().RegistrarUsuario(usuario.Nome, usuario.Senha);
+    return Results.Ok("Usuário registrado com sucesso!");
+});
+
+usuariosGroup.MapPost("/login", ([FromBody] Usuario usuario) =>
+{
+    var usuarioAutenticado = new UsuarioService().AutenticarUsuario(usuario.Nome, usuario.Senha);
+    return Results.Ok($"Login realizado com sucesso! Bem-vindo, {usuarioAutenticado.Nome}.");
 });
 
 app.Run();

@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "DGm6VfPYzXE=",
+  "dgSpecHash": "mAiIl0nzbxI=",
   "success": true,
-  "projectFilePath": "C:\\workstation\\SENACprojects\\MeuDiarioSenac\\Diario.Model\\Diario.Model.csproj",
+  "projectFilePath": "C:\\workplace\\DevWeb\\back\\MeuDiarioSenac\\Diario.Model\\Diario.Model.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\ferna\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.20\\microsoft.netcore.app.ref.9.0.20.nupkg.sha512",
-    "C:\\Users\\ferna\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.20\\microsoft.windowsdesktop.app.ref.9.0.20.nupkg.sha512",
-    "C:\\Users\\ferna\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.20\\microsoft.aspnetcore.app.ref.9.0.20.nupkg.sha512"
+    "C:\\Users\\Suporte\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.18\\microsoft.netcore.app.ref.9.0.18.nupkg.sha512",
+    "C:\\Users\\Suporte\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.18\\microsoft.windowsdesktop.app.ref.9.0.18.nupkg.sha512",
+    "C:\\Users\\Suporte\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.18\\microsoft.aspnetcore.app.ref.9.0.18.nupkg.sha512"
   ],
   "logs": []
 }
