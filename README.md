@@ -1,91 +1,110 @@
-# MeuDiarioSenac
+# MeuDiarioSenac — Back-end
 
-Aplicação de console em C# para gerenciamento de um diário pessoal, com CRUD completo de registros, persistidos em banco de dados MySQL via Entity Framework Core.
-
-## Funcionalidades
-
-- **CRUD completo** de registros (inserir, listar, buscar por ID, atualizar e remover)
-- **Validações de regra de negócio** (título obrigatório e limitado a 50 caracteres, conteúdo limitado a 3000 caracteres, data obrigatoriamente atual)
-- **Persistência de dados** em banco MySQL, usando Entity Framework Core como ORM
-- **Camada de acesso a dados (DAO)** separada da lógica de interface, isolando as operações de banco das interações com o usuário
-
-## Estrutura do projeto
-
-O projeto é dividido em múltiplos projetos .NET:
-
-- **`diario`** — projeto de console (executável), com o menu interativo (`Program.cs`)
-- **`diario.data`** — camada de acesso a dados: `RegistroDAO` e o contexto do Entity Framework (`banco.cs`)
-- **`diario.business`** — regras de negócio e validações (`RegistroBusiness`)
-- **`diario.model`** — entidades do domínio (`Registro`, `Usuario`)
+API para gerenciamento de um diário pessoal, com autenticação de usuários e CRUD completo de registros. Construída em C#/.NET com arquitetura em camadas, persistência via Entity Framework Core (MySQL) e exposta tanto por uma aplicação de console quanto por uma Web API.
 
 ## Tecnologias
 
-- C# / .NET
-- Entity Framework Core
-- MySQL
+| Tecnologia | Uso neste projeto |
+|---|---|
+| **.NET 9 / C#** | Linguagem e runtime |
+| **ASP.NET Core Minimal APIs** | Endpoints HTTP (`Diario.WebApi`) |
+| **Entity Framework Core 9 (Pomelo.MySql)** | ORM e migrations contra MySQL |
+| **MySQL** | Banco de dados relacional |
+| **System.IdentityModel.Tokens.Jwt** | Geração de token JWT |
 
-## Antes de rodar: é necessário ter o MySQL Server e executar as Migrations
+## Estrutura do projeto
 
-O banco de dados **não está incluído neste repositório** — apenas o código-fonte. Para que o projeto funcione, é obrigatório ter um servidor MySQL rodando localmente e gerar/aplicar as migrations do Entity Framework Core antes de tentar rodar ou testar o CRUD. Sem isso, o banco `MeuDiarioSenac` e suas tabelas não vão existir, e a aplicação vai falhar ao tentar se conectar.
+Arquitetura em camadas, cada uma só referenciando a camada imediatamente abaixo — sem dependências circulares:
+
+```
+Diario            (Console)   ─┬─→ Diario.Business ─┬─→ Diario.Model
+Diario.WebApi      (API)      ─┤                    │
+                                ├─→ Diario.Data ──────┘
+                                └─→ Diario.Service ──┬─→ Diario.Business
+                                                       ├─→ Diario.Data
+                                                       └─→ Diario.Model
+```
+
+- **`Diario.Model`** — entidades de domínio puras (`Registro`, `Usuario`), sem lógica nem dependência de banco.
+- **`Diario.Data`** — acesso a dados: `MeuDiarioSENACContext` (o `DbContext` do EF Core) e os DAOs (`RegistroDAO`, `UsuarioDAO`).
+- **`Diario.Business`** — regras de validação de negócio (`RegistroBusiness`, `UsuarioBusiness`), cada regra lança `ArgumentException` com mensagem explicando o motivo.
+- **`Diario.Service`** — orquestra Business + Data numa única operação (ex: validar e depois persistir). É a camada que tanto o Console quanto a WebApi consomem, evitando duplicar lógica entre as duas interfaces. Também contém o `TokenService`, responsável por gerar o JWT.
+- **`Diario`** — aplicação de console com menu interativo, consome `Diario.Service` diretamente.
+- **`Diario.WebApi`** — expõe os mesmos recursos via HTTP (Minimal APIs), também consumindo `Diario.Service`.
+
+## Funcionalidades atuais
+
+- CRUD completo de registros (inserir, listar, buscar por ID, atualizar, remover)
+- Cadastro e autenticação de usuários (`POST /usuarios/registrar`, `POST /usuarios/login`)
+- Geração de token JWT a partir das configurações em `appsettings.json`
+- Validações de regra de negócio antes de qualquer persistência (título obrigatório/máx. 50 caracteres, conteúdo máx. 3000 caracteres, data obrigatoriamente atual; nome de usuário obrigatório/máx. 50 caracteres, senha mínima de 6 caracteres)
+
+## Endpoints da WebApi
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/registros` | Lista todos os registros |
+| `GET` | `/registros/{id}` | Busca um registro por ID |
+| `POST` | `/registros` | Cria um novo registro |
+| `PUT` | `/registros/{id}` | Atualiza um registro existente |
+| `DELETE` | `/registros/{id}` | Remove um registro |
+| `POST` | `/usuarios/registrar` | Cria um novo usuário |
+| `POST` | `/usuarios/login` | Autentica um usuário |
+| `POST` | `/login/auth` | Endpoint de teste do `TokenService` (ver seção de pendências) |
+
+## Como rodar
 
 ### Pré-requisitos
 
-- .NET SDK instalado
-- **MySQL Server** instalado e rodando localmente (baixe em [dev.mysql.com/downloads/installer](https://dev.mysql.com/downloads/installer/) — não é necessário criar conta na Oracle, use a opção "No thanks, just start my download")
+- .NET SDK 9 instalado
+- MySQL Server rodando localmente
 - Ferramenta `dotnet-ef` instalada globalmente:
   ```bash
   dotnet tool install --global dotnet-ef
   ```
-- Pacote `Microsoft.EntityFrameworkCore.Design` instalado no projeto `diario` (necessário para o comando `dotnet ef` funcionar em uma estrutura multi-projeto). Use a mesma versão principal do EF Core já usada no `diario.data`:
-  ```bash
-  dotnet add diario package Microsoft.EntityFrameworkCore.Design --version <versão do EF Core do projeto>
-  ```
 
 ### Passo a passo
 
-1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/Butzki/MeuDiarioSenac.git
-   cd MeuDiarioSenac
-   ```
-
-2. **Confira a connection string** em `diario.data/banco.cs`. Por padrão, o projeto espera:
-   ```
-   server=localhost;database=MeuDiarioSenac;uid=root;pwd=1234
-   ```
-   Ajuste usuário, senha ou servidor conforme o seu ambiente MySQL local.
-
-3. **Restaure os pacotes do projeto**
-   ```bash
-   dotnet restore
-   ```
-
-4. **Gere as migrations** (cria os arquivos que descrevem a estrutura do banco a partir do modelo). Como o `DbContext` fica em `diario.data` e o executável é `diario`, é necessário indicar os dois projetos:
-   ```bash
-   dotnet ef migrations add InitialCreate --project diario.data --startup-project diario
-   ```
-
-5. **Aplique as migrations no banco de dados** (cria o banco `MeuDiarioSenac` e a tabela `Registros`)
-   ```bash
-   dotnet ef database update --project diario.data --startup-project diario
-   ```
-
-6. **Rode a aplicação**
-   ```bash
-   dotnet run --project diario
-   ```
-
-### Usando o menu
-
-Ao rodar a aplicação, o menu apresenta as seguintes opções:
-
-```
-1 - Inserir registro
-2 - Listar registros
-3 - Buscar registro por ID
-4 - Remover registro por ID
-5 - Atualizar registro por ID
-6 - Sair
+```bash
+git clone https://github.com/Butzki/MeuDiarioSenac.git
+cd MeuDiarioSenac
+dotnet restore
 ```
 
-> **Observação:** todo registro criado é associado a um `UsuarioId` fixo (`1`), já que ainda não há um cadastro de usuários implementado nesta versão do projeto.
+Configure a connection string em `Diario.Data/banco.cs` (ver seção de pendências sobre isso) e aplique as migrations:
+
+```bash
+cd Diario.Data
+dotnet ef database update
+cd ..
+```
+
+Para rodar a **WebApi**:
+```bash
+dotnet run --project Diario.WebApi
+```
+
+Para rodar o **Console**:
+```bash
+dotnet run --project Diario
+```
+
+## Boas práticas já aplicadas neste projeto (referência rápida)
+
+Para quem está começando em C#/.NET, estes são os padrões que este repositório já segue e vale manter em qualquer projeto novo:
+
+- **Nomenclatura PascalCase** para projetos, pastas e classes (`Diario.Business`, não `diario.business`) — é a convenção oficial do .NET.
+- **Uma responsabilidade por camada**: o Model nunca sabe de banco; o Data nunca valida regra de negócio; o Business nunca persiste nada.
+- **Validação lança exceção com mensagem clara**, em vez de retornar `bool`/`null` silenciosamente — quem chama sempre sabe exatamente o que deu errado.
+- **Migrations como histórico versionado do banco**, nunca alterar uma tabela manualmente fora desse fluxo.
+- **Nenhuma biblioteca adicionada sem necessidade concreta** — o projeto evolui com o mínimo de dependências que resolve o problema atual.
+
+## Pendências conhecidas
+
+Ver o documento de acompanhamento publicado durante o desenvolvimento, ou a conversa com o time, para a lista priorizada — resumo rápido:
+
+- Senha de usuário ainda salva em texto puro (decisão consciente, a revisitar)
+- `TokenService` ainda não inclui os dados do usuário (claims) dentro do token
+- Sem middleware de tratamento de exceções (erros de validação retornam 500 em vez de 400)
+- Connection string do MySQL hardcoded em `banco.cs`
+- **`bin/` e `obj/` de todos os projetos estão versionados no Git** (não há `.gitignore`) — precisa de limpeza

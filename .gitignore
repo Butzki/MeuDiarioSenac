@@ -1,0 +1,16 @@
+# Build
+bin/
+obj/
+out/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+
+# User Secrets
+secrets.json
+
+# appsettings com dados sensíveis,
+appsettings.Local.json

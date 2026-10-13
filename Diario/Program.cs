@@ -1,6 +1,76 @@
-﻿var diario = new RegistroService();
+﻿UsuarioService usuarioService = new UsuarioService();
+Usuario usuarioLogado = IniciarSessao();
+
+var diario = new RegistroService();
 
 RegistroBusiness registroBusiness = new RegistroBusiness();
+
+Usuario IniciarSessao()
+{
+    while (true)
+    {
+        Console.WriteLine("=== Meu Diário ===");
+        Console.WriteLine("1 - Entrar");
+        Console.WriteLine("2 - Criar conta");
+        var opcao = Console.ReadLine();
+
+        switch (opcao)
+        {
+            case "1":
+                return Login();
+            case "2":
+                Registrar();
+                break;
+            default:
+                Console.WriteLine("\nOpção inválida.\n");
+                break;
+        }
+    }
+}
+
+Usuario Login()
+{
+    while (true)
+    {
+        Console.WriteLine("=== Login ===");
+        Console.WriteLine("Nome: ");
+        string nome = Console.ReadLine();
+
+        Console.WriteLine("Senha: ");
+        string senha = Console.ReadLine();
+
+        try
+        {
+            var usuario = usuarioService.AutenticarUsuario(nome, senha);
+            Console.WriteLine($"\nBem-vindo, {usuario.Nome}!\n");
+            return usuario;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"\nErro: {ex.Message}\n");
+        }
+    }
+}
+
+void Registrar()
+{
+    Console.WriteLine("=== Criar conta ===");
+    Console.WriteLine("Nome: ");
+    string nome = Console.ReadLine();
+
+    Console.WriteLine("Senha: ");
+    string senha = Console.ReadLine();
+
+    try
+    {
+        usuarioService.RegistrarUsuario(nome, senha);
+        Console.WriteLine("\nConta criada com sucesso! Faça login para continuar.\n");
+    }
+    catch (ArgumentException ex)
+    {
+        Console.WriteLine($"\nErro: {ex.Message}\n");
+    }
+}
 
 void CriarRegistro(RegistroService diario)
 {
@@ -19,34 +89,23 @@ void CriarRegistro(RegistroService diario)
         return;
         }
 
-    DateTime data;
-    try
-    {
-        Console.WriteLine("Data (yyyy-MM-dd): ");
-        data = DateTime.Parse(Console.ReadLine());
-        registroBusiness.DataAtual(data);
-    }
-    catch (ArgumentException ex)
-    {
-        Console.WriteLine($"Erro capturado: {ex.Message}");
-        return;
-    }
-    catch (FormatException)
-    {
-        Console.WriteLine("\nFormato de data inválido. Por favor, use o formato yyyy-MM-dd, com mascara.\n");
-        return;
-    }
-
     Console.WriteLine("Conteudo: ");
     string conteudo = Console.ReadLine();
 
-    diario.AdicionarRegistro(new Registro
+    try
     {
-        Titulo = titulo,
-        Data = data,
-        Conteudo = conteudo,
-    });
-    Console.WriteLine("\nRegistro inserido com sucesso!\n");
+        diario.AdicionarRegistro(new Registro
+        {
+            Titulo = titulo,
+            Data = DateTime.Now,
+            Conteudo = conteudo,
+        }, usuarioLogado.Id);
+        Console.WriteLine("\nRegistro inserido com sucesso!\n");
+    }
+    catch (ArgumentException ex)
+    {
+        Console.WriteLine($"\nErro capturado: {ex.Message}\n");
+    }
 }
 
 void ListarRegistros(RegistroService diario)
@@ -124,27 +183,22 @@ void AtualizarRegistro(RegistroService diario)
                 Console.WriteLine("Titulo: ");
                 string titulo = Console.ReadLine();
 
-                DateTime data;
-                try
-                    {
-                        Console.WriteLine("Data (yyyy-MM-dd): ");
-                        data = DateTime.Parse(Console.ReadLine());
-                    } 
-                catch (FormatException)
-                    {
-                Console.WriteLine("\nFormato de data inválido. Por favor, use o formato yyyy-MM-dd, com mascara.\n");
-                return;
-                    }
                 Console.WriteLine("Conteudo: ");
                 string conteudo = Console.ReadLine();
 
                 r.Titulo = titulo;
-                r.Data = data;
+                r.Data = DateTime.Now;
                 r.Conteudo = conteudo;
-                
-                diario.AtualizarRegistro(r);
 
-                Console.WriteLine("\nRegistro atualizado com sucesso!\n");
+                try
+                {
+                    diario.AtualizarRegistro(r);
+                    Console.WriteLine("\nRegistro atualizado com sucesso!\n");
+                }
+                catch (ArgumentException ex)
+                {
+                    Console.WriteLine($"\nErro capturado: {ex.Message}\n");
+                }
                 return;
                 }       
 
