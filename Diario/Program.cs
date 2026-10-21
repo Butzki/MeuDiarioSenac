@@ -110,7 +110,7 @@ void CriarRegistro(RegistroService diario)
 
 void ListarRegistros(RegistroService diario)
 {
-    var registros = diario.ListarRegistros();
+    var registros = diario.ListarRegistros(usuarioLogado.Id);
 
     if (registros.Count == 0)
     {
@@ -129,20 +129,15 @@ void BuscarRegistro(RegistroService diario)
     Console.WriteLine("Digite o ID do registro que deseja encontrar: ");
     int id = int.Parse(Console.ReadLine());
 
-    var r = diario.BuscarPorId(id);
-        if (r == null)
-        {
-                    Console.WriteLine("\nRegistro não encontrado.\n");
-        }
-        else if (r.Id == id)
-        {
-            Console.WriteLine($"ID: {r.Id}, Titulo: {r.Titulo}, Data: {r.Data}, Conteudo: {r.Conteudo}");
-            return;
-        }
-        else
-        {
-            Console.WriteLine("\nRegistro não encontrado.\n");
-        }
+    var r = diario.BuscarPorId(id, usuarioLogado.Id);
+    if (r == null)
+    {
+        Console.WriteLine("\nRegistro não encontrado.\n");
+    }
+    else
+    {
+        Console.WriteLine($"ID: {r.Id}, Titulo: {r.Titulo}, Data: {r.Data}, Conteudo: {r.Conteudo}");
+    }
 }
 
 void DeletarRegistro(RegistroService diario)
@@ -150,21 +145,8 @@ void DeletarRegistro(RegistroService diario)
     Console.WriteLine("Digite o ID do registro que deseja remover: ");
     int id = int.Parse(Console.ReadLine());
 
-    var r = diario.BuscarPorId(id);
-        if (r == null)
-        {
-                    Console.WriteLine("\nRegistro não encontrado.\n");
-        }
-        else if (r.Id == id)
-        {
-            diario.RemoverRegistro(r);
-            Console.WriteLine("\nRegistro removido com sucesso!\n");
-            return;
-        }
-        else
-        {
-            Console.WriteLine("\nRegistro não encontrado.\n");
-        }
+    var removido = diario.RemoverRegistro(new Registro { Id = id }, usuarioLogado.Id);
+    Console.WriteLine(removido ? "\nRegistro removido com sucesso!\n" : "\nRegistro não encontrado.\n");
 }
 
 void AtualizarRegistro(RegistroService diario)
@@ -172,40 +154,32 @@ void AtualizarRegistro(RegistroService diario)
     Console.WriteLine("Digite o ID do registro que deseja atualizar: ");
     int id = int.Parse(Console.ReadLine());
 
-    var r = diario.BuscarPorId(id);
-        if (r == null)
-        {
-                    Console.WriteLine("\nRegistro não encontrado.\n");
-        }
+    var r = diario.BuscarPorId(id, usuarioLogado.Id);
+    if (r == null)
+    {
+        Console.WriteLine("\nRegistro não encontrado.\n");
+        return;
+    }
 
-        else if (r.Id == id)
-        {
-                Console.WriteLine("Titulo: ");
-                string titulo = Console.ReadLine();
+    Console.WriteLine("Titulo: ");
+    string titulo = Console.ReadLine();
 
-                Console.WriteLine("Conteudo: ");
-                string conteudo = Console.ReadLine();
+    Console.WriteLine("Conteudo: ");
+    string conteudo = Console.ReadLine();
 
-                r.Titulo = titulo;
-                r.Data = DateTime.Now;
-                r.Conteudo = conteudo;
+    r.Titulo = titulo;
+    r.Data = DateTime.Now;
+    r.Conteudo = conteudo;
 
-                try
-                {
-                    diario.AtualizarRegistro(r);
-                    Console.WriteLine("\nRegistro atualizado com sucesso!\n");
-                }
-                catch (ArgumentException ex)
-                {
-                    Console.WriteLine($"\nErro capturado: {ex.Message}\n");
-                }
-                return;
-                }       
-
-            else
-            {
-                Console.WriteLine("\nRegistro não encontrado.\n");
-            }
+    try
+    {
+        diario.AtualizarRegistro(r, usuarioLogado.Id);
+        Console.WriteLine("\nRegistro atualizado com sucesso!\n");
+    }
+    catch (ArgumentException ex)
+    {
+        Console.WriteLine($"\nErro capturado: {ex.Message}\n");
+    }
 }
 
 while (true)

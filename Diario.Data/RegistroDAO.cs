@@ -1,7 +1,6 @@
-
 public class RegistroDAO
 {
-    private MeuDiarioSENACContext  conexao = new MeuDiarioSENACContext();
+    private MeuDiarioSENACContext conexao = new MeuDiarioSENACContext();
 
     public void Inserir(Registro registro)
     {
@@ -9,12 +8,12 @@ public class RegistroDAO
         conexao.SaveChanges();
     }
 
-    public List<Registro> ListarTodos()
+    public List<Registro> ListarPorUsuario(int usuarioId)
     {
-        return conexao.Registros.ToList();
+        return conexao.Registros.Where(r => r.UsuarioId == usuarioId).ToList();
     }
 
-   public Registro BuscarPorId(int id)
+    public Registro BuscarPorId(int id)
     {
         return conexao.Registros.Find(id);
     }
@@ -30,5 +29,4 @@ public class RegistroDAO
         conexao.Registros.Update(registro);
         conexao.SaveChanges();
     }
-
-} 
+}

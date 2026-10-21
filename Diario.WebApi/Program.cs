@@ -34,6 +34,25 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// --- Middleware de tratamento de exceções ---
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next(context);
+    }
+    catch (ArgumentException ex)
+    {
+        context.Response.StatusCode = 400;
+        await context.Response.WriteAsJsonAsync(new { erro = ex.Message });
+    }
+    catch (Exception)
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsJsonAsync(new { erro = "Ocorreu um erro interno." });
+    }
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -54,38 +73,37 @@ usuariosGroup.MapPost("/login", ([FromBody] Usuario usuario) =>
 
 var registrosGroup = app.MapGroup("/registros").RequireAuthorization();
 
-registrosGroup.MapGet("/", () =>
+int ObterUsuarioId(ClaimsPrincipal user) => int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+registrosGroup.MapGet("/", (ClaimsPrincipal user) =>
 {
-    return new RegistroService().ListarRegistros();
+    return new RegistroService().ListarRegistros(ObterUsuarioId(user));
 });
 
-registrosGroup.MapGet("/{id}", (int id) =>
+registrosGroup.MapGet("/{id}", (int id, ClaimsPrincipal user) =>
 {
-    var registro = new RegistroService().BuscarPorId(id);
+    var registro = new RegistroService().BuscarPorId(id, ObterUsuarioId(user));
     return registro is null ? Results.NotFound() : Results.Ok(registro);
 });
 
 registrosGroup.MapPost("/", ([FromBody] Registro registro, ClaimsPrincipal user) =>
 {
-    var usuarioId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-    new RegistroService().AdicionarRegistro(registro, usuarioId);
+    new RegistroService().AdicionarRegistro(registro, ObterUsuarioId(user));
     return Results.Ok("Registro inserido com sucesso!");
 });
 
-registrosGroup.MapPut("/{id}", (int id, [FromBody] Registro registro) =>
+registrosGroup.MapPut("/{id}", (int id, [FromBody] Registro registro, ClaimsPrincipal user) =>
 {
     registro.Id = id;
-    new RegistroService().AtualizarRegistro(registro);
-    return Results.Ok("Registro atualizado com sucesso!");
+    var atualizado = new RegistroService().AtualizarRegistro(registro, ObterUsuarioId(user));
+    return atualizado ? Results.Ok("Registro atualizado com sucesso!") : Results.NotFound();
 });
 
-registrosGroup.MapDelete("/{id}", (int id) =>
+registrosGroup.MapDelete("/{id}", (int id, ClaimsPrincipal user) =>
 {
-    var registro = new RegistroService().BuscarPorId(id);
-    if (registro is null) return Results.NotFound();
-
-    new RegistroService().RemoverRegistro(registro);
-    return Results.Ok("Registro removido com sucesso!");
+    var registro = new Registro { Id = id };
+    var removido = new RegistroService().RemoverRegistro(registro, ObterUsuarioId(user));
+    return removido ? Results.Ok("Registro removido com sucesso!") : Results.NotFound();
 });
 
 app.Run();
