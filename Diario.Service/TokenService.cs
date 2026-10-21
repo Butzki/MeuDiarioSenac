@@ -17,27 +17,25 @@ public class TokenService
     {
         var jwtSettings = _configuration.GetSection("JWTSettings");
         var handler = new JwtSecurityTokenHandler();
-        var chaveSecretaBytes = Encoding.ASCII.GetBytes
-        (jwtSettings["SecretKey"]);
+        var chaveSecretaBytes = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
+        var credenciais = new SigningCredentials(new SymmetricSecurityKey(chaveSecretaBytes), SecurityAlgorithms.HmacSha256Signature);
 
-        var credenciais = new SigningCredentials(
-            new SymmetricSecurityKey(chaveSecretaBytes), SecurityAlgorithms.HmacSha256Signature
-        );
-        
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, usuario.Nome),
+            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new Claim(ClaimTypes.Name, usuario.Nome)
         };
 
         var descriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
+            Issuer = jwtSettings["Issuer"],
+            Audience = jwtSettings["Audience"],
             SigningCredentials = credenciais,
             Expires = DateTime.UtcNow.AddHours(double.Parse(jwtSettings["ExpirationInHours"]))
         };
         
         var token = handler.CreateToken(descriptor);
         return handler.WriteToken(token);
-
     }
 }

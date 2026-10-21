@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,56 +13,43 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var jwtSettings = builder.Configuration.GetSection("JWTSettings");
-var chaveSecretaBytes = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
+var chaveSecretaBytes = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!);
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = "JwtBearer";
-    options.DefaultChallengeScheme = "JwtBearer";
-}).AddJwtBearer("JwtBearer", options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(chaveSecretaBytes),
-        ClockSkew = TimeSpan.Zero
-    };
-});
-builder.Services.AddAuthorization();
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(chaveSecretaBytes)
+        };
+    });
 
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Use(async (context, next) =>
+var usuariosGroup = app.MapGroup("/usuarios");
+
+usuariosGroup.MapPost("/registrar", ([FromBody] Usuario usuario) =>
 {
-    try
-    {
-        await next(context);
-    }
-    catch (ArgumentException ex)
-    {
-        context.Response.StatusCode = 400;
-        await context.Response.WriteAsJsonAsync(new { erro = ex.Message });
-    }
-    catch (Exception)
-    {
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsJsonAsync(new { erro = "Ocorreu um erro interno." });
-    }
+    new UsuarioService().RegistrarUsuario(usuario.Nome, usuario.Senha);
+    return Results.Ok("Usuário registrado com sucesso!");
 });
 
-app.MapPost("/login/auth", ( [FromBody] Usuario usuario) =>
+usuariosGroup.MapPost("/login", ([FromBody] Usuario usuario) =>
 {
-    TokenService authService = new TokenService(builder.Configuration);
-    return authService.GerarToken(usuario);
+    var usuarioAutenticado = new UsuarioService().AutenticarUsuario(usuario.Nome, usuario.Senha);
+    var token = new TokenService(builder.Configuration).GerarToken(usuarioAutenticado);
+    return Results.Ok(new { token });
 });
 
 var registrosGroup = app.MapGroup("/registros").RequireAuthorization();
@@ -76,9 +65,10 @@ registrosGroup.MapGet("/{id}", (int id) =>
     return registro is null ? Results.NotFound() : Results.Ok(registro);
 });
 
-registrosGroup.MapPost("/", ([FromBody] Registro registro) =>
+registrosGroup.MapPost("/", ([FromBody] Registro registro, ClaimsPrincipal user) =>
 {
-    new RegistroService().AdicionarRegistro(registro, registro.UsuarioId);
+    var usuarioId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    new RegistroService().AdicionarRegistro(registro, usuarioId);
     return Results.Ok("Registro inserido com sucesso!");
 });
 
@@ -96,20 +86,6 @@ registrosGroup.MapDelete("/{id}", (int id) =>
 
     new RegistroService().RemoverRegistro(registro);
     return Results.Ok("Registro removido com sucesso!");
-});
-
-var usuariosGroup = app.MapGroup("/usuarios");
-
-usuariosGroup.MapPost("/registrar", ([FromBody] Usuario usuario) =>
-{
-    new UsuarioService().RegistrarUsuario(usuario.Nome, usuario.Senha);
-    return Results.Ok("Usuário registrado com sucesso!");
-});
-
-usuariosGroup.MapPost("/login", ([FromBody] Usuario usuario) =>
-{
-    var usuarioAutenticado = new UsuarioService().AutenticarUsuario(usuario.Nome, usuario.Senha);
-    return Results.Ok($"Login realizado com sucesso! Bem-vindo, {usuarioAutenticado.Nome}.");
 });
 
 app.Run();

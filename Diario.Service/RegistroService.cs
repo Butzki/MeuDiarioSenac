@@ -3,17 +3,17 @@
     private readonly RegistroBusiness registroBusiness = new RegistroBusiness();
     private readonly RegistroDAO registroDAO = new RegistroDAO();
 
-    public void AdicionarRegistro(Registro registro, int usuarioId)
-    {
-        registroBusiness.TituloInformado(registro.Titulo);
-        registroBusiness.TituloMax(registro.Titulo);
-        registroBusiness.ConteudoMax(registro.Conteudo);
-        registroBusiness.DataAtual(registro.Data);
+public void AdicionarRegistro(Registro registro, int usuarioId)
+{
+    registroBusiness.TituloInformado(registro.Titulo);
+    registroBusiness.TituloMax(registro.Titulo);
+    registroBusiness.ConteudoMax(registro.Conteudo);
+    registroBusiness.DataAtual(registro.Data);
 
-        registro.UsuarioId = usuarioId;
+    registro.UsuarioId = usuarioId;
 
-        registroDAO.Inserir(registro);
-    }
+    registroDAO.Inserir(registro);
+}
 
     public List<Registro> ListarRegistros() => registroDAO.ListarTodos();
 
