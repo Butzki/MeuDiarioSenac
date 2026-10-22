@@ -36,7 +36,7 @@
 
         registroExistente.Titulo = registro.Titulo;
         registroExistente.Conteudo = registro.Conteudo;
-        registroExistente.Data = registro.Data;
+        registroExistente.Data = DateTime.Now;   // ← troca aqui, mesmo princípio do Adicionar
 
         registroDAO.Update(registroExistente);
         return true;
