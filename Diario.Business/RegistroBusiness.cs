@@ -1,6 +1,4 @@
-// métodos bool, implementar try/catch para validar regra de negócio
-// titulo obrigatorio e max 50 char, Conteudo max 3000 caracteres, data somente atual
- 
+
 public class RegistroBusiness {
 public bool TituloInformado(string entrada)
 {
